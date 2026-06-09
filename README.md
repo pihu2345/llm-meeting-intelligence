@@ -28,6 +28,7 @@ meeting-intelligence/
 │   └── meetings.db          # SQLite database (auto-created)
 ├── frontend/
 │   ├── src/
+|    |   ├── App.js       
 │   │   ├── App.jsx          # Full React UI
 │   │   └── index.js
 │   ├── public/index.html

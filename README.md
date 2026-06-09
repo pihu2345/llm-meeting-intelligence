@@ -17,17 +17,29 @@ This system solves that problem by using Generative AI (LLMs) to automatically e
 
 ⚙️ Tech Stack
 Python / Node.js (Backend)
+
 FastAPI (API Layer)
+
 Groq API / OpenAI API (LLM)
+
 MongoDB / PostgreSQL (Database)
+
 Neo4j (Optional for relationships)
+
 React.js (Frontend - optional)
+
 🏗️ System Workflow
 User inputs meeting text (API / UI)
+
+
 LLM processes and extracts entities
+
 Data is structured into JSON format
+
 Stored in database (SQL / NoSQL / Graph DB)
+
 Users query using natural language
+
 📥 API Endpoint
 POST /process-meeting
 Input:

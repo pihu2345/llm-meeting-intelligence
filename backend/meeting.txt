@@ -1,0 +1,4 @@
+The payment integration is delayed because the Vendor API is unstable.
+Rahul will coordinate with the backend team before Friday.
+If this issue continues, it may impact the Phase-2 release.
+Priya escalated the concern to leadership.

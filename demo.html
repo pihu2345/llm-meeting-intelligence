@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MeetingIQ — Meeting Intelligence System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; background: #0B0F1A; color: #E2E8F0; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+    :root {
+      --bg: #0B0F1A; --surface: #121929; --card: #1A2236; --border: #1E2D47;
+      --accent: #3B82F6; --accent-dim: #1E3A5F; --green: #10B981; --red: #EF4444;
+      --yellow: #F59E0B; --orange: #F97316; --text: #E2E8F0; --muted: #64748B; --highlight: #93C5FD;
+    }
+    nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; }
+    .nav-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; height: 60px; gap: 8px; }
+    .logo { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
+    .logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg, #3B82F6, #7C3AED); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .logo-text { line-height: 1; }
+    .logo-title { font-weight: 800; font-size: 15px; }
+    .logo-sub { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+    .tab-btn { background: transparent; color: var(--muted); border: none; border-radius: 8px; padding: 8px 14px; cursor: pointer; font-size: 13px; font-weight: 500; font-family: inherit; transition: all 0.15s; }
+    .tab-btn.active { background: var(--accent-dim); color: var(--highlight); font-weight: 700; }
+    .main { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .badge { display: inline-block; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .badge-high, .badge-critical { background: #EF444422; color: #EF4444; border: 1px solid #EF444433; }
+    .badge-medium { background: #F59E0B22; color: #F59E0B; border: 1px solid #F59E0B33; }
+    .badge-low, .badge-resolved, .badge-completed { background: #10B98122; color: #10B981; border: 1px solid #10B98133; }
+    .badge-open, .badge-active, .badge-pending { background: #F9731622; color: #F97316; border: 1px solid #F9731633; }
+    .badge-at_risk { background: #F9731622; color: #F97316; border: 1px solid #F9731633; }
+    textarea, input { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 14px; outline: none; font-family: inherit; width: 100%; }
+    textarea:focus, input:focus { border-color: var(--accent); }
+    button { font-family: inherit; cursor: pointer; border-radius: 8px; font-weight: 600; transition: opacity 0.15s; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--accent); color: #fff; border: none; padding: 10px 20px; font-size: 13px; }
+    .btn-secondary { background: #1E2D47; color: var(--muted); border: 1px solid #2A3D5A; padding: 8px 16px; font-size: 13px; }
+    .btn-success { background: #10B98122; color: #10B981; border: 1px solid #10B98133; padding: 6px 12px; font-size: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; }
+    .stat-val { font-size: 36px; font-weight: 800; line-height: 1; margin: 6px 0 4px; }
+    .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); border-bottom: 1px solid var(--border); }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+    .section-title { color: var(--text); font-size: 14px; font-weight: 700; margin: 0 0 16px 0; }
+    .tag-pill { display: inline-flex; gap: 4px; background: var(--accent-dim); border-radius: 6px; padding: 4px 10px; margin: 3px; font-size: 12px; }
+    .api-banner { background: #EF444411; border: 1px solid #EF444433; border-radius: 10px; padding: 16px 20px; margin-bottom: 24px; color: #EF4444; font-size: 13px; }
+    .success-box { background: #10B98111; border: 1px solid #10B98133; border-radius: 10px; padding: 16px 20px; margin-top: 16px; color: #10B981; }
+    .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    pre { margin: 0; white-space: pre-wrap; word-break: break-word; }
+    .example-chip { background: #1E2D47; border: 1px solid var(--border); color: var(--muted); border-radius: 20px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: inherit; font-weight: 500; }
+    .example-chip:hover { color: var(--highlight); border-color: var(--accent); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    #api-key-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; align-items: center; gap: 12px; }
+    #api-key-bar input { max-width: 380px; padding: 7px 12px; font-size: 13px; }
+    #api-key-bar label { font-size: 13px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- API Key Bar -->
+<div id="api-key-bar">
+  <label>🔑 Anthropic API Key:</label>
+  <input type="password" id="apiKeyInput" placeholder="sk-ant-..." />
+  <button class="btn-primary" onclick="saveKey()" style="padding:7px 16px;font-size:13px;">Connect</button>
+  <span id="keyStatus" style="color:var(--muted);font-size:12px;">Not connected</span>
+</div>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="logo-icon">🧠</div>
+      <div class="logo-text">
+        <div class="logo-title">MeetingIQ</div>
+        <div class="logo-sub">INTELLIGENCE SYSTEM</div>
+      </div>
+    </div>
+    <button class="tab-btn active" onclick="showTab('dashboard',this)">📊 Dashboard</button>
+    <button class="tab-btn" onclick="showTab('ingest',this)">⚡ Ingest</button>
+    <button class="tab-btn" onclick="showTab('meetings',this)">📅 Meetings</button>
+    <button class="tab-btn" onclick="showTab('escalations',this)">🚨 Escalations</button>
+    <button class="tab-btn" onclick="showTab('actions',this)">✅ Action Items</button>
+    <button class="tab-btn" onclick="showTab('risks',this)">⚠️ Risks</button>
+    <button class="tab-btn" onclick="showTab('query',this)">🔍 Query</button>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main">
+
+  <!-- Dashboard -->
+  <div id="tab-dashboard">
+    <div id="dash-content"><div style="color:var(--muted);padding:40px;text-align:center">Loading...</div></div>
+  </div>
+
+  <!-- Ingest -->
+  <div id="tab-ingest" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="margin:0;color:var(--text)">Ingest Meeting</h2>
+      <div style="display:flex;gap:10px">
+        <button class="btn-secondary" onclick="loadExamples()">🎯 Load 3 Example Meetings</button>
+        <label class="btn-secondary" style="cursor:pointer">📎 Upload File <input type="file" accept=".txt,.md" onchange="uploadFile(this)" style="display:none"/></label>
+      </div>
+    </div>
+    <input id="meetingTitle" placeholder="Meeting title (optional)" style="margin-bottom:12px" />
+    <textarea id="meetingContent" placeholder="Paste raw meeting transcript, summary, or discussion notes here..." rows="10" style="margin-bottom:12px;resize:vertical"></textarea>
+    <button class="btn-primary" onclick="ingestMeeting()">⚡ Extract Intelligence</button>
+    <div id="ingest-result"></div>
+  </div>
+
+  <!-- Meetings -->
+  <div id="tab-meetings" class="hidden">
+    <h2 style="color:var(--text)">All Meetings</h2>
+    <div id="meetings-list"></div>
+  </div>
+
+  <!-- Escalations -->
+  <div id="tab-escalations" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="margin:0;color:var(--text)">Escalations</h2>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="filterEscalations('all')">All</button>
+        <button class="btn-secondary" onclick="filterEscalations('open')">Open</button>
+        <button class="btn-secondary" onclick="filterEscalations('resolved')">Resolved</button>
+      </div>
+    </div>
+    <div id="escalations-list"></div>
+  </div>
+
+  <!-- Action Items -->
+  <div id="tab-actions" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="margin:0;color:var(--text)">Action Items</h2>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="filterActions('all')">All</button>
+        <button class="btn-secondary" onclick="filterActions('pending')">Pending</button>
+        <button class="btn-secondary" onclick="filterActions('completed')">Completed</button>
+      </div>
+    </div>
+    <div id="actions-list"></div>
+  </div>
+
+  <!-- Risks -->
+  <div id="tab-risks" class="hidden">
+    <h2 style="color:var(--text)">Risk Register</h2>
+    <div id="risks-list"></div>
+  </div>
+
+  <!-- Query -->
+  <div id="tab-query" class="hidden">
+    <h2 style="color:var(--text)">Natural Language Query</h2>
+    <p style="color:var(--muted);margin-top:0">Ask anything about your meetings, tasks, risks, and escalations.</p>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <input id="queryInput" placeholder="Ask a question about your meetings..." onkeydown="if(event.key==='Enter') queryMeetings()" />
+      <button class="btn-primary" onclick="queryMeetings()">Ask</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
+      <button class="example-chip" onclick="setQ('What are the current unresolved escalations?')">Current escalations?</button>
+      <button class="example-chip" onclick="setQ('Which projects are at risk?')">At-risk projects?</button>
+      <button class="example-chip" onclick="setQ('Show all pending tasks assigned to Rahul')">Tasks by Rahul?</button>
+      <button class="example-chip" onclick="setQ('List all high-priority blockers')">High-priority blockers?</button>
+      <button class="example-chip" onclick="setQ('What decisions were made across meetings?')">Key decisions?</button>
+      <button class="example-chip" onclick="setQ('Who are all the stakeholders mentioned?')">All stakeholders?</button>
+    </div>
+    <div id="query-history"></div>
+  </div>
+
+</div>
+
+<script>
+// ─── In-memory DB ──────────────────────────────────────────────────────────────
+const DB = { meetings: [], projects: [], action_items: [], escalations: [], risks: [], decisions: [], blockers: [], stakeholders: [] };
+let apiKey = '';
+
+function uid() { return Math.random().toString(36).slice(2,10); }
+
+function saveKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val.startsWith('sk-')) { alert('Please enter a valid Anthropic API key (starts with sk-)'); return; }
+  apiKey = val;
+  document.getElementById('keyStatus').textContent = '✓ Connected';
+  document.getElementById('keyStatus').style.color = '#10B981';
+}
+
+// ─── Claude API Call ───────────────────────────────────────────────────────────
+async function callClaude(prompt, maxTokens=3000) {
+  if (!apiKey) throw new Error('Please enter your Anthropic API key above.');
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content[0].text;
+}
+
+// ─── Tab Navigation ────────────────────────────────────────────────────────────
+function showTab(id, btn) {
+  document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.remove('hidden');
+  btn.classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'meetings') renderMeetings();
+  if (id === 'escalations') renderEscalations('all');
+  if (id === 'actions') renderActions('pending');
+  if (id === 'risks') renderRisks();
+}
+
+// ─── Ingest ────────────────────────────────────────────────────────────────────
+async function ingestMeeting() {
+  const content = document.getElementById('meetingContent').value.trim();
+  const title = document.getElementById('meetingTitle').value.trim() || 'Untitled Meeting';
+  if (!content) return;
+  const btn = event.target;
+  btn.textContent = '⏳ Extracting...'; btn.disabled = true;
+  document.getElementById('ingest-result').innerHTML = '';
+  try {
+    const prompt = `You are an expert Meeting Intelligence Analyst. Analyze the following meeting content and extract structured organizational intelligence.
+
+Return ONLY a valid JSON object (no markdown, no extra text) with this exact structure:
+{
+  "projects": [{"name":"...","description":"...","status":"active|at_risk|completed"}],
+  "action_items": [{"description":"...","owner":"...","deadline":"...","priority":"high|medium|low"}],
+  "escalations": [{"description":"...","raised_by":"...","severity":"critical|high|medium|low"}],
+  "risks": [{"description":"...","impact":"high|medium|low","likelihood":"high|medium|low","mitigation":"..."}],
+  "decisions": [{"description":"...","rationale":"...","decided_by":"..."}],
+  "blockers": [{"description":"...","affected_project":"...","owner":"..."}],
+  "stakeholders": [{"name":"...","role":"...","team":"..."}],
+  "summary": "2-3 sentence executive summary."
+}
+
+Meeting Content:
+${content}`;
+
+    const raw = await callClaude(prompt);
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const extracted = JSON.parse(clean);
+    
+    const mid = uid();
+    const now = new Date().toISOString();
+    DB.meetings.push({ id: mid, title, raw_content: content, created_at: now });
+    extracted.projects?.forEach(p => DB.projects.push({ id: uid(), meeting_id: mid, meeting_title: title, ...p }));
+    extracted.action_items?.forEach(a => DB.action_items.push({ id: uid(), meeting_id: mid, meeting_title: title, status: 'pending', ...a }));
+    extracted.escalations?.forEach(e => DB.escalations.push({ id: uid(), meeting_id: mid, meeting_title: title, status: 'open', ...e }));
+    extracted.risks?.forEach(r => DB.risks.push({ id: uid(), meeting_id: mid, meeting_title: title, ...r }));
+    extracted.decisions?.forEach(d => DB.decisions.push({ id: uid(), meeting_id: mid, meeting_title: title, ...d }));
+    extracted.blockers?.forEach(b => DB.blockers.push({ id: uid(), meeting_id: mid, meeting_title: title, status: 'active', ...b }));
+    extracted.stakeholders?.forEach(s => DB.stakeholders.push({ id: uid(), meeting_id: mid, meeting_title: title, ...s }));
+
+    const counts = { projects: extracted.projects?.length||0, action_items: extracted.action_items?.length||0, escalations: extracted.escalations?.length||0, risks: extracted.risks?.length||0, decisions: extracted.decisions?.length||0, blockers: extracted.blockers?.length||0, stakeholders: extracted.stakeholders?.length||0 };
+    
+    document.getElementById('ingest-result').innerHTML = `
+      <div class="success-box">
+        <div style="font-weight:700;margin-bottom:12px">✓ Intelligence Extracted — ${title}</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+          ${Object.entries(counts).map(([k,v]) => `<div style="text-align:center"><div style="color:var(--accent);font-size:24px;font-weight:800">${v}</div><div style="color:var(--muted);font-size:11px">${k.replace('_',' ')}</div></div>`).join('')}
+        </div>
+        ${extracted.summary ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid #10B98133;font-size:14px;color:var(--text)">${extracted.summary}</div>` : ''}
+      </div>`;
+    document.getElementById('meetingContent').value = '';
+    document.getElementById('meetingTitle').value = '';
+  } catch(e) {
+    document.getElementById('ingest-result').innerHTML = `<div style="color:var(--red);background:var(--red)11;border:1px solid var(--red)33;border-radius:8px;padding:12px;margin-top:12px">Error: ${e.message}</div>`;
+  }
+  btn.textContent = '⚡ Extract Intelligence'; btn.disabled = false;
+}
+
+async function uploadFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const text = await file.text();
+  document.getElementById('meetingContent').value = text;
+  document.getElementById('meetingTitle').value = file.name.replace(/\.(txt|md)$/,'').replace(/_/g,' ');
+}
+
+async function loadExamples() {
+  const examples = [
+    { title: 'Q3 Payment Integration Sync', content: 'The payment integration is delayed because the Vendor API is unstable. Rahul will coordinate with the backend team before Friday. If this issue continues, it may impact the Phase-2 release. Priya escalated the concern to leadership. The team decided to implement a fallback payment processor as a contingency plan. Anika from DevOps will set up monitoring alerts for API uptime by Wednesday. Risk identified: If Phase-2 slips by more than 2 weeks, Q3 revenue targets will be at risk. The mobile team is blocked waiting for the API fix before they can start integration testing.' },
+    { title: 'Product Roadmap Review - Week 24', content: 'Engineering sync: The authentication service migration is 80% complete. Siddharth owns the final testing phase, deadline is end of sprint (June 20). Critical blocker: The staging environment is down due to a database misconfiguration. DevOps team (lead: Karan) needs to resolve this today. Risk: If staging is not restored by tomorrow, the release will need to be pushed back by one week. Decision made: The team agreed to skip the optional performance improvements in this sprint to meet the deadline. Escalation from QA team: Test coverage dropped below 70% threshold - Meera raised this to the VP of Engineering. Follow-up: All team leads to submit sprint retrospective notes by Friday.' },
+    { title: 'Customer Success & Support Triage', content: 'Three enterprise clients have reported data export failures in the last 48 hours. Escalation: Tanvir from enterprise support escalated to product team. Root cause analysis assigned to Deepak (backend), target: identify root cause within 24 hours. Risk: Potential SLA breach for 3 accounts worth $2.4M ARR if not resolved by Friday. Action item: Customer success team (Sunita) to send holding communication to affected clients immediately. Action item: Product team to prepare hotfix by Thursday noon. Decision: Rollback to v2.3.1 approved as contingency if hotfix is not ready in time. Approved by CTO. Blocker: Access to production logs requires security team approval - Arjun to expedite this request today.' }
+  ];
+  const btn = event.target;
+  btn.textContent = '⏳ Loading...'; btn.disabled = true;
+  for (const ex of examples) {
+    document.getElementById('meetingTitle').value = ex.title;
+    document.getElementById('meetingContent').value = ex.content;
+    await ingestMeeting2(ex.title, ex.content);
+  }
+  btn.textContent = '🎯 Load 3 Example Meetings'; btn.disabled = false;
+  alert('3 example meetings loaded successfully!');
+}
+
+async function ingestMeeting2(title, content) {
+  try {
+    const prompt = `You are an expert Meeting Intelligence Analyst. Analyze the following meeting content and extract structured organizational intelligence.
+Return ONLY a valid JSON object (no markdown, no extra text) with this exact structure:
+{"projects":[{"name":"...","description":"...","status":"active|at_risk|completed"}],"action_items":[{"description":"...","owner":"...","deadline":"...","priority":"high|medium|low"}],"escalations":[{"description":"...","raised_by":"...","severity":"critical|high|medium|low"}],"risks":[{"description":"...","impact":"high|medium|low","likelihood":"high|medium|low","mitigation":"..."}],"decisions":[{"description":"...","rationale":"...","decided_by":"..."}],"blockers":[{"description":"...","affected_project":"...","owner":"..."}],"stakeholders":[{"name":"...","role":"...","team":"..."}],"summary":"..."}
+Meeting Content:\n${content}`;
+    const raw = await callClaude(prompt, 2000);
+    const extracted = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    const mid = uid(); const now = new Date().toISOString();
+    DB.meetings.push({ id: mid, title, raw_content: content, created_at: now });
+    extracted.projects?.forEach(p => DB.projects.push({ id: uid(), meeting_id: mid, meeting_title: title, ...p }));
+    extracted.action_items?.forEach(a => DB.action_items.push({ id: uid(), meeting_id: mid, meeting_title: title, status: 'pending', ...a }));
+    extracted.escalations?.forEach(e => DB.escalations.push({ id: uid(), meeting_id: mid, meeting_title: title, status: 'open', ...e }));
+    extracted.risks?.forEach(r => DB.risks.push({ id: uid(), meeting_id: mid, meeting_title: title, ...r }));
+    extracted.decisions?.forEach(d => DB.decisions.push({ id: uid(), meeting_id: mid, meeting_title: title, ...d }));
+    extracted.blockers?.forEach(b => DB.blockers.push({ id: uid(), meeting_id: mid, meeting_title: title, status: 'active', ...b }));
+    extracted.stakeholders?.forEach(s => DB.stakeholders.push({ id: uid(), meeting_id: mid, meeting_title: title, ...s }));
+  } catch(e) { console.error(e); }
+}
+
+// ─── Dashboard ─────────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const openEsc = DB.escalations.filter(e => e.status === 'open').length;
+  const activeBlk = DB.blockers.filter(b => b.status === 'active').length;
+  const pending = DB.action_items.filter(a => a.status === 'pending').length;
+  const highP = DB.action_items.filter(a => a.status === 'pending' && a.priority === 'high').length;
+  const atRisk = DB.projects.filter(p => p.status === 'at_risk').length;
+
+  document.getElementById('dash-content').innerHTML = `
+    <div class="grid-3">
+      <div class="stat"><div class="stat-label">Total Meetings</div><div class="stat-val" style="color:var(--accent)">${DB.meetings.length}</div></div>
+      <div class="stat"><div class="stat-label">Open Escalations</div><div class="stat-val" style="color:${openEsc>0?'var(--red)':'var(--green)'}">${openEsc}</div></div>
+      <div class="stat"><div class="stat-label">Active Blockers</div><div class="stat-val" style="color:${activeBlk>0?'var(--orange)':'var(--green)'}">${activeBlk}</div></div>
+      <div class="stat"><div class="stat-label">Pending Actions</div><div class="stat-val" style="color:var(--yellow)">${pending}</div></div>
+      <div class="stat"><div class="stat-label">High Priority</div><div class="stat-val" style="color:var(--red)">${highP}</div><div style="font-size:12px;color:var(--muted)">pending action items</div></div>
+      <div class="stat"><div class="stat-label">At-Risk Projects</div><div class="stat-val" style="color:${atRisk>0?'var(--orange)':'var(--green)'}">${atRisk}</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3 class="section-title">🚨 Recent Escalations</h3>
+        ${DB.escalations.slice(-5).reverse().map(e => `<div style="padding:10px 0;border-bottom:1px solid var(--border)"><div style="color:var(--text);font-size:13px;margin-bottom:6px">${e.description}</div><span class="badge badge-${e.severity}">${e.severity}</span>${e.raised_by?`<span style="color:var(--muted);font-size:12px;margin-left:8px">by ${e.raised_by}</span>`:''}</div>`).join('') || '<div style="color:var(--muted);font-size:13px">No escalations</div>'}
+      </div>
+      <div class="card">
+        <h3 class="section-title">🔴 Active Blockers</h3>
+        ${DB.blockers.filter(b=>b.status==='active').slice(-5).reverse().map(b => `<div style="padding:10px 0;border-bottom:1px solid var(--border)"><div style="color:var(--text);font-size:13px;margin-bottom:4px">${b.description}</div>${b.affected_project?`<div style="color:var(--muted);font-size:12px">→ ${b.affected_project}</div>`:''}</div>`).join('') || '<div style="color:var(--muted);font-size:13px">No active blockers</div>'}
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="section-title">⚡ Pending Action Items</h3>
+      ${DB.action_items.filter(a=>a.status==='pending').length === 0 ? '<div style="color:var(--muted);font-size:13px">No pending actions</div>' : `
+      <table><thead><tr><th>Priority</th><th>Task</th><th>Owner</th><th>Deadline</th><th>Meeting</th></tr></thead><tbody>
+      ${DB.action_items.filter(a=>a.status==='pending').slice(-10).reverse().map(a=>`<tr><td><span class="badge badge-${a.priority}">${a.priority}</span></td><td style="color:var(--text)">${a.description}</td><td style="color:var(--highlight)">${a.owner||'—'}</td><td style="color:var(--muted)">${a.deadline||'—'}</td><td style="color:var(--muted);font-size:12px">${a.meeting_title||'—'}</td></tr>`).join('')}
+      </tbody></table>`}
+    </div>
+  `;
+}
+
+// ─── Meetings ──────────────────────────────────────────────────────────────────
+function renderMeetings() {
+  document.getElementById('meetings-list').innerHTML = DB.meetings.length === 0
+    ? '<div style="color:var(--muted);text-align:center;padding:40px">No meetings ingested yet.</div>'
+    : DB.meetings.slice().reverse().map(m => `
+      <div class="card" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="showMeetingDetail('${m.id}')">
+        <span style="color:var(--text);font-weight:600">${m.title}</span>
+        <span style="color:var(--muted);font-size:12px">${new Date(m.created_at).toLocaleString()}</span>
+      </div>`).join('');
+}
+
+function showMeetingDetail(mid) {
+  const m = DB.meetings.find(x => x.id === mid);
+  if (!m) return;
+  const get = (table) => DB[table].filter(x => x.meeting_id === mid);
+  const section = (title, items, renderFn) => items.length ? `<div class="card"><h3 class="section-title">${title}</h3>${items.map(renderFn).join('')}</div>` : '';
+
+  document.getElementById('meetings-list').innerHTML = `
+    <button class="btn-secondary" onclick="renderMeetings()" style="margin-bottom:16px">← Back</button>
+    <h2 style="color:var(--text)">${m.title}</h2>
+    ${section('🎯 Projects', get('projects'), p => `<div style="margin-bottom:12px"><div style="color:var(--text);font-weight:600">${p.name}</div><div style="color:var(--muted);font-size:13px">${p.description}</div><span class="badge badge-${p.status}" style="margin-top:6px;display:inline-block">${p.status}</span></div>`)}
+    ${section('⚡ Action Items', get('action_items'), a => `<div style="padding:10px 0;border-bottom:1px solid var(--border)"><div style="color:var(--text)">${a.description}</div><div style="display:flex;gap:8px;margin-top:6px;align-items:center"><span class="badge badge-${a.priority}">${a.priority}</span>${a.owner?`<span style="color:var(--highlight);font-size:12px">👤 ${a.owner}</span>`:''} ${a.deadline?`<span style="color:var(--muted);font-size:12px">📅 ${a.deadline}</span>`:''}</div></div>`)}
+    ${section('🚨 Escalations', get('escalations'), e => `<div style="margin-bottom:12px"><div style="color:var(--text)">${e.description}</div><div style="display:flex;gap:8px;margin-top:6px"><span class="badge badge-${e.severity}">${e.severity}</span>${e.raised_by?`<span style="color:var(--muted);font-size:12px">by ${e.raised_by}</span>`:''}</div></div>`)}
+    ${section('⚠️ Risks', get('risks'), r => `<div style="margin-bottom:12px"><div style="color:var(--text)">${r.description}</div>${r.mitigation?`<div style="color:var(--muted);font-size:12px;margin-top:4px">Mitigation: ${r.mitigation}</div>`:''}</div>`)}
+    ${section('🔴 Blockers', get('blockers'), b => `<div style="margin-bottom:12px"><div style="color:var(--text)">${b.description}</div>${b.affected_project?`<div style="color:var(--muted);font-size:12px">→ ${b.affected_project}</div>`:''}</div>`)}
+    ${section('✅ Decisions', get('decisions'), d => `<div style="margin-bottom:12px"><div style="color:var(--text)">${d.description}</div>${d.rationale?`<div style="color:var(--muted);font-size:12px;margin-top:4px">Rationale: ${d.rationale}</div>`:''}</div>`)}
+    ${section('👥 Stakeholders', get('stakeholders'), s => `<span class="tag-pill"><span style="color:var(--highlight)">${s.name}</span>${s.team?`<span style="color:var(--muted);font-size:11px">(${s.team})</span>`:''}</span>`)}
+    <div class="card"><h3 class="section-title">📝 Raw Content</h3><pre style="color:var(--muted);font-size:12px">${m.raw_content}</pre></div>
+  `;
+}
+
+// ─── Escalations ───────────────────────────────────────────────────────────────
+let escFilter = 'all';
+function filterEscalations(f) { escFilter = f; renderEscalations(f); }
+function renderEscalations(f) {
+  const items = f === 'all' ? DB.escalations : DB.escalations.filter(e => e.status === f);
+  document.getElementById('escalations-list').innerHTML = items.length === 0
+    ? `<div style="color:var(--muted);text-align:center;padding:40px">No ${f} escalations</div>`
+    : items.slice().reverse().map(e => `
+      <div class="card" style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="color:var(--text);font-weight:600;margin-bottom:8px">${e.description}</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span class="badge badge-${e.severity}">${e.severity}</span>
+            <span class="badge badge-${e.status}">${e.status}</span>
+            ${e.raised_by?`<span style="color:var(--muted);font-size:12px">Raised by: <span style="color:var(--highlight)">${e.raised_by}</span></span>`:''}
+            ${e.meeting_title?`<span style="color:var(--muted);font-size:12px">${e.meeting_title}</span>`:''}
+          </div>
+        </div>
+        ${e.status==='open'?`<button class="btn-success" onclick="resolveEscalation('${e.id}')">Resolve</button>`:''}
+      </div>`).join('');
+}
+function resolveEscalation(id) {
+  const e = DB.escalations.find(x => x.id === id);
+  if (e) { e.status = 'resolved'; renderEscalations(escFilter); renderDashboard(); }
+}
+
+// ─── Action Items ──────────────────────────────────────────────────────────────
+let actFilter = 'pending';
+function filterActions(f) { actFilter = f; renderActions(f); }
+function renderActions(f) {
+  const items = f === 'all' ? DB.action_items : DB.action_items.filter(a => a.status === f);
+  document.getElementById('actions-list').innerHTML = items.length === 0
+    ? `<div style="color:var(--muted);text-align:center;padding:40px">No ${f} action items</div>`
+    : `<table><thead><tr><th>Priority</th><th>Task</th><th>Owner</th><th>Deadline</th><th>Meeting</th><th>Status</th><th></th></tr></thead><tbody>
+      ${items.slice().reverse().map(a=>`<tr>
+        <td><span class="badge badge-${a.priority}">${a.priority}</span></td>
+        <td style="color:var(--text);max-width:260px">${a.description}</td>
+        <td style="color:var(--highlight)">${a.owner||'—'}</td>
+        <td style="color:var(--muted)">${a.deadline||'—'}</td>
+        <td style="color:var(--muted);font-size:12px">${a.meeting_title||'—'}</td>
+        <td><span class="badge badge-${a.status}">${a.status}</span></td>
+        <td>${a.status==='pending'?`<button class="btn-success" onclick="completeAction('${a.id}')">Done</button>`:''}</td>
+      </tr>`).join('')}
+    </tbody></table>`;
+}
+function completeAction(id) {
+  const a = DB.action_items.find(x => x.id === id);
+  if (a) { a.status = 'completed'; renderActions(actFilter); renderDashboard(); }
+}
+
+// ─── Risks ─────────────────────────────────────────────────────────────────────
+function renderRisks() {
+  document.getElementById('risks-list').innerHTML = DB.risks.length === 0
+    ? '<div style="color:var(--muted);text-align:center;padding:40px">No risks identified yet.</div>'
+    : DB.risks.slice().reverse().map(r => `
+      <div class="card">
+        <div style="color:var(--text);font-weight:600;margin-bottom:8px">${r.description}</div>
+        <div style="display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap;align-items:center">
+          <span style="color:var(--muted);font-size:12px">Impact: <span class="badge badge-${r.impact}">${r.impact}</span></span>
+          <span style="color:var(--muted);font-size:12px">Likelihood: <span class="badge badge-${r.likelihood}">${r.likelihood}</span></span>
+          ${r.meeting_title?`<span style="color:var(--muted);font-size:12px">Source: ${r.meeting_title}</span>`:''}
+        </div>
+        ${r.mitigation?`<div style="color:var(--muted);font-size:13px;background:var(--bg);padding:8px 12px;border-radius:6px;margin-top:6px">🛡 Mitigation: ${r.mitigation}</div>`:''}
+      </div>`).join('');
+}
+
+// ─── Query ─────────────────────────────────────────────────────────────────────
+function setQ(q) { document.getElementById('queryInput').value = q; }
+async function queryMeetings() {
+  const q = document.getElementById('queryInput').value.trim();
+  if (!q) return;
+  const btn = event.target;
+  btn.textContent = '...'; btn.disabled = true;
+  const ctx = JSON.stringify({ meetings: DB.meetings, action_items: DB.action_items, escalations: DB.escalations, risks: DB.risks, blockers: DB.blockers, decisions: DB.decisions, stakeholders: DB.stakeholders, projects: DB.projects }, null, 2);
+  try {
+    const answer = await callClaude(`You are an AI assistant for a Meeting Intelligence System. Answer the user's question using only the data below.\n\nOrganizational Data:\n${ctx}\n\nQuestion: ${q}\n\nGive a clear, concise, structured answer.`, 1500);
+    const hist = document.getElementById('query-history');
+    hist.insertAdjacentHTML('afterbegin', `
+      <div class="card" style="margin-bottom:16px">
+        <div style="color:var(--highlight);font-weight:600;margin-bottom:8px;font-size:13px">Q: ${q}</div>
+        <div style="color:var(--text);font-size:14px;line-height:1.7;white-space:pre-wrap">${answer}</div>
+        <div style="color:var(--muted);font-size:11px;margin-top:8px">${new Date().toLocaleTimeString()}</div>
+      </div>`);
+    document.getElementById('queryInput').value = '';
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+  btn.textContent = 'Ask'; btn.disabled = false;
+}
+
+// Init
+renderDashboard();
+</script>
+</body>
+</html>
